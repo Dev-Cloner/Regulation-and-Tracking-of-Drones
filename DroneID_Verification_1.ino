@@ -1,4 +1,4 @@
-#include "SSLClient.h"
+#include "SSL_Client.h" // SSL Client Header File or Path
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
@@ -44,8 +44,8 @@ TwoWire I2C1 = TwoWire(0);  // First I2C bus
 #define TINY_GSM_MODEM_SIM7600   // Modem is SIM7000
 #define TINY_GSM_RX_BUFFER 1024  // Set RX buffer to 1Kb
 
-#define AWS_IOT_PUBLISH_TOPIC "subham"
-#define AWS_IOT_SUBSCRIBE_TOPIC "esp32/sub"
+#define AWS_IOT_PUBLISH_TOPIC "Topic"
+#define AWS_IOT_SUBSCRIBE_TOPIC "ESP32"
 
 // Include after TinyGSM definitions
 #include <TinyGsmClient.h>
@@ -58,7 +58,7 @@ const char simPIN[] = "";         // SIM card PIN code, if any
 
 // MQTT Config
 const char client_name[] = "MyEsp32";
-const char mqtt_broker[] = "a2u9gyfv7s162-ats.iot.ap-south-1.amazonaws.com";
+const char mqtt_broker[] = "aws_broker";
 int secure_port = 8883;  // TCP-TLS Port
 
 // Layers stack
@@ -79,7 +79,7 @@ uint8_t uidLength;
 bool check = false;
 
 String pilotID;
-String droneID = "UA005M4S1EX";
+String droneID = "DRONE_ID";
 
 // For read the MQTT events
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -101,7 +101,7 @@ void reconnect() {
     if (client.connect(client_name)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish(AWS_IOT_PUBLISH_TOPIC, "hello world");
+      client.publish(AWS_IOT_PUBLISH_TOPIC, "Hello AWS");
       // ... and resubscribe
       client.subscribe(AWS_IOT_PUBLISH_TOPIC);
     } else {
@@ -223,7 +223,6 @@ void verify() {
 
   if (uidLength == 4) {
     uint8_t data[16];
-    // Authenticate using the default key (0xFF 0xFF 0xFF 0xFF 0xFF 0xFF)
     success = nfc.mifareclassic_AuthenticateBlock(uid, uidLength, 1, 0, (uint8_t*)"\xFF\xFF\xFF\xFF\xFF\xFF");
     if (success) {
       // Read 16 bytes from block 1
@@ -246,11 +245,9 @@ void verify() {
         }
         Serial.println();
 
-        // Additional condition: first byte is a vowel, third byte is a consonant, and thirteenth byte is '2'
-        if (isVowel(decryptedData[0]) && isConsonant(decryptedData[9]) && isVowel(decryptedData[15])) {
-          String part1 = decryptedString.substring(1,9);
-          String part2 = decryptedString.substring(10,15);
-          pilotID = part1 + part2;
+        // Additional condition
+        if (Addnitional_condition) {
+          // Extraction of pilotID and other details
           Serial.println("Card verified");
           check = true;
           delay(1000);
@@ -264,17 +261,6 @@ void verify() {
       Serial.println("Authentication failed.");
     }
   }
-}
-
-bool isVowel(char c) {
-  c = tolower(c);
-  return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
-}
-
-bool isConsonant(char c) {
-  c = tolower(c);
-  return (c >= 'a' && c <= 'z' && !isVowel(c));
-  delay(1000);
 }
 
 void setup() {
@@ -354,22 +340,8 @@ void loop() {
     sim_modem.simUnlock(simPIN);
   }
 
-  // Set modes
-  /*
-    2 Automatic
-    13 GSM only
-    38 LTE only
-    51 GSM and LTE only
-  * * * */
   sim_modem.setNetworkMode(2);
   delay(3000);
-  /*
-    1 CAT-M
-    2 NB-Iot
-    3 CAT-M and NB-IoT
-  * * */
-  //sim_modem.setPreferredMode(3);
-  //delay(3000);
 
   // Wait for network availability
   SerialMon.print("Waiting for network...");
