@@ -20,8 +20,3 @@ This project implements an **RFID-enabled drone tracking system** designed for *
 - **Microcontroller / Embedded System** (e.g., Arduino / ESP32)  
 - **Python / C++** for algorithm development  
 - **Data Processing Algorithms** for validation and detection  
-
-## Getting Started  
-1. Clone the repository:  
-   ```bash
-   git clone https://github.com/your-username/drone-rfid-tracking.git
